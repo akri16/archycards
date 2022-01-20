@@ -3,22 +3,30 @@ package com.akribase.archycards
 import android.content.res.Resources
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.math.MathUtils
 import androidx.recyclerview.widget.RecyclerView
+import kotlin.math.PI
+import kotlin.math.acos
+import kotlin.math.floor
+import kotlin.math.sin
 
-class ArcLayoutManager(resources: Resources, private val screenWidth: Int) :
-    RecyclerView.LayoutManager() {
+class ArcLayoutManager(
+    resources: Resources,
+    private val screenWidth: Int,
+    private val viewWidth: Int,
+    private val viewHeight: Int,
+):RecyclerView.LayoutManager() {
 
-    private val TAG = "CustomLayoutManager"
     private var horizontalScrollOffset = 0
 
-    private val viewWidth = resources.getDimensionPixelSize(R.dimen.item_width)
     private val recyclerViewHeight =
         (resources.getDimensionPixelSize(R.dimen.recyclerview_height)).toDouble()
 
     override fun generateDefaultLayoutParams(): RecyclerView.LayoutParams =
-        RecyclerView.LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
+        RecyclerView.LayoutParams(viewWidth, viewHeight)
 
     override fun onLayoutChildren(recycler: RecyclerView.Recycler, state: RecyclerView.State) {
         fill(recycler, state)
@@ -27,8 +35,9 @@ class ArcLayoutManager(resources: Resources, private val screenWidth: Int) :
     private fun fill(recycler: RecyclerView.Recycler, state: RecyclerView.State) {
         detachAndScrapAttachedViews(recycler)
 
+        // Looping
         val firstVisiblePosition =
-            Math.floor(horizontalScrollOffset.toDouble() / viewWidth.toDouble()).toInt()
+            floor(horizontalScrollOffset.toDouble() / viewWidth.toDouble()).toInt()
         val lastVisiblePosition = (horizontalScrollOffset + screenWidth) / viewWidth
 
         for (index in firstVisiblePosition..lastVisiblePosition) {
@@ -41,6 +50,8 @@ class ArcLayoutManager(resources: Resources, private val screenWidth: Int) :
 
             layoutChildView(index, viewWidth, view)
         }
+
+        // Remove scrap views
         val scrapListCopy = recycler.scrapList.toList()
         scrapListCopy.forEach {
             recycler.recycleView(it.itemView)
@@ -50,24 +61,25 @@ class ArcLayoutManager(resources: Resources, private val screenWidth: Int) :
     private fun layoutChildView(i: Int, viewWidthWithSpacing: Int, view: View) {
         val left = i * viewWidthWithSpacing - horizontalScrollOffset
         val right = left + viewWidth
-        val top = getTopOffsetForView(left + viewWidth / 2)
-        val bottom = top + viewWidth
 
-        measureChild(view, viewWidth, viewWidth)
-
-        layoutDecorated(view, left, top, right, bottom)
-    }
-
-    private fun getTopOffsetForView(viewCentreX: Int): Int {
+        val viewCentreX = left + viewWidth / 2
         val s: Double = screenWidth.toDouble() / 2
-        val h: Double = recyclerViewHeight - viewWidth.toDouble()
+        val h: Double = recyclerViewHeight
         val radius: Double = (h * h + s * s) / (h * 2)
-
         val cosAlpha = (s - viewCentreX) / radius
-        val alpha = Math.acos(MathUtils.clamp(cosAlpha, -1.0, 1.0))
+        val alpha = acos(MathUtils.clamp(cosAlpha, -1.0, 1.0))
+        val yComponent = radius - (radius * sin(alpha))
 
-        val yComponent = radius - (radius * Math.sin(alpha))
-        return yComponent.toInt()
+        val top = (h - yComponent).toInt()
+        val bottom = top + viewHeight
+
+        // View Rotation
+        view.rotation = 90f - (alpha * (180 / PI)).toFloat()
+
+        // Measure
+        measureChild(view, 0, viewHeight)
+        // Layout
+        layoutDecorated(view, left, top, right, bottom)
     }
 
     override fun canScrollHorizontally(): Boolean = true
