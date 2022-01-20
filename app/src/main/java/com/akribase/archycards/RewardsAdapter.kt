@@ -9,14 +9,24 @@ import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.akribase.archycards.databinding.ItemViewBinding
 
-class RewardsAdapter(private val rewards: List<Int>, val rvState: MutableLiveData<RvState>) :
-    RecyclerView.Adapter<RewardsAdapter.RewardsHolder>() {
+class RewardsAdapter(
+    private val rewards: List<Int>,
+    val rvState: MutableLiveData<RvState>,
+    val itemWidth: Int,
+    val itemHeight: Int
+): RecyclerView.Adapter<RewardsAdapter.RewardsHolder>() {
 
     @SuppressLint("ClickableViewAccessibility")
     inner class RewardsHolder(private val binding: ItemViewBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         init {
+
+            binding.root.layoutParams = binding.root.layoutParams.apply {
+                width = itemWidth
+                height = itemHeight
+            }
+
 //            val gestureDetector = GestureDetector(itemView.context,
 //                object : GestureDetector.SimpleOnGestureListener() {
 //                    override fun onLongPress(e: MotionEvent) {

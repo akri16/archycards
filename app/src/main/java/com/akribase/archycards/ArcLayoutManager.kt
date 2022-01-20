@@ -77,12 +77,12 @@ class ArcLayoutManager(
         view.rotation = 90f - (alpha * (180 / PI)).toFloat()
 
         // Measure
-        measureChild(view, 0, viewHeight)
+        measureChildWithMargins(view, 0, 0)
         // Layout
-        layoutDecorated(view, left, top, right, bottom)
+        layoutDecoratedWithMargins(view, left, top, right, bottom)
     }
 
-    override fun canScrollHorizontally(): Boolean = true
+    override fun canScrollHorizontally() = true
 
     override fun scrollHorizontallyBy(
         dx: Int,

@@ -1,5 +1,6 @@
 package com.akribase.archycards
 
+import android.content.res.ColorStateList
 import android.content.res.Resources
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -21,20 +22,27 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+
+        rvState.observe(this) {
+            binding.frame.imageTintList = ColorStateList.valueOf(getColor(
+                if (!it.isLongPressed) R.color.primary else R.color.grey
+            ))
+        }
+
         initRv(binding.rv)
     }
 
     private fun initRv(rv: RecyclerView) {
         val rewards = listOf(R.drawable.reward1, R.drawable.reward2, R.drawable.reward3)
         val screenWidth = Resources.getSystem().displayMetrics.widthPixels
-        val viewWidth = screenWidth / 2
-        val viewHeight = (1.3f * viewWidth).toInt()
+        val viewWidth = screenWidth/2
+        val viewHeight = (1.25f * viewWidth).toInt()
 
-        rv.adapter = RewardsAdapter(rewards, rvState)
+        rv.adapter = RewardsAdapter(rewards, rvState, viewWidth, viewHeight)
         rv.layoutManager = ArcLayoutManager(resources, screenWidth, viewWidth, viewHeight)
 
-        binding.imageView2.layoutParams =
-            (binding.imageView2.layoutParams as ConstraintLayout.LayoutParams).apply {
+        binding.frame.layoutParams =
+            (binding.frame.layoutParams as ConstraintLayout.LayoutParams).apply {
                 width = viewWidth
                 height = viewHeight
             }
