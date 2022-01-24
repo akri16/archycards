@@ -1,19 +1,19 @@
 package com.akribase.archycards;
 
+import android.annotation.SuppressLint
 import android.content.Context;
 import android.graphics.Canvas
 import android.util.Log
 import android.view.View
-import androidx.lifecycle.LiveData
+import androidx.core.view.MotionEventCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.SnapHelper
-import java.text.FieldPosition
+import kotlin.math.max
 
 abstract class SwipeCallback(
     private val context: Context,
-    private val snapPosition: MutableLiveData<RvState>
+    private val rvstate: MutableLiveData<RvState>
 ): ItemTouchHelper.SimpleCallback(ItemTouchHelper.DOWN, 0) {
 
     var selectedView: View? = null
@@ -27,7 +27,7 @@ abstract class SwipeCallback(
     }
 
     override fun getDragDirs(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
-        val rvState = snapPosition.value
+        val rvState = rvstate.value
         if (rvState?.snapPosition == viewHolder.layoutPosition) {
             return ItemTouchHelper.DOWN
         }
@@ -36,18 +36,38 @@ abstract class SwipeCallback(
 
     override fun isLongPressDragEnabled() = true
 
+    override fun onChildDraw(
+        c: Canvas,
+        recyclerView: RecyclerView,
+        viewHolder: RecyclerView.ViewHolder,
+        dX: Float,
+        dY: Float,
+        actionState: Int,
+        isCurrentlyActive: Boolean
+    ) {
+        super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+        val rvHeight = recyclerView.height
+        val viewPos = recyclerView.getChildRelativePos(viewHolder.itemView)
+        val itemHeight = viewHolder.itemView.height
+        val maxTranslation = rvHeight - viewPos.top - itemHeight/2
+        val progress = dY/maxTranslation
+
+        rvstate.value = rvstate.value?.copy(progress = progress)
+    }
+
     override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
         val view = viewHolder?.itemView
 
         if (actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
             selectedView = view
             view?.animate()?.scaleX(1.2f)?.scaleY(1.2f)?.withEndAction {
-                snapPosition.value = snapPosition.value?.copy(isLongPressed = true)
+                rvstate.value = rvstate.value?.copy(isLongPressed = true)
             }
         } else {
             selectedView?.animate()?.scaleX(1f)?.scaleY(1f)?.withEndAction {
-                snapPosition.value = snapPosition.value?.copy(isLongPressed = false)
+                rvstate.value = rvstate.value?.copy(isLongPressed = false)
             }
+            selectedView = null
         }
 
         super.onSelectedChanged(viewHolder, actionState)

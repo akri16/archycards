@@ -26,18 +26,6 @@ class RewardsAdapter(
                 width = itemWidth
                 height = itemHeight
             }
-
-//            val gestureDetector = GestureDetector(itemView.context,
-//                object : GestureDetector.SimpleOnGestureListener() {
-//                    override fun onLongPress(e: MotionEvent) {
-//                        val rvStateVal = rvState.value
-//                        if (rvStateVal?.isLongPressed == false && rvStateVal.snapPosition == layoutPosition) {
-//                            rvState.value = rvStateVal.copy(isLongPressed = true)
-//                        }
-//                    }
-//                })
-//
-//            itemView.setOnTouchListener { v, event -> gestureDetector.onTouchEvent(event) }
         }
 
         fun bind(id: Int) {

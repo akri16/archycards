@@ -3,8 +3,9 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/Dell/Desktop/Amit/Android_Projects/archycards/app/src/main/res/drawable/glow_rect.xml" value="0.20185185185185187" />
         <entry key="..\:/Users/Dell/Desktop/Amit/Android_Projects/archycards/app/src/main/res/drawable/rect_border.xml" value="0.2111111111111111" />
-        <entry key="..\:/Users/Dell/Desktop/Amit/Android_Projects/archycards/app/src/main/res/layout/activity_main.xml" value="0.2" />
+        <entry key="..\:/Users/Dell/Desktop/Amit/Android_Projects/archycards/app/src/main/res/layout/activity_main.xml" value="0.152" />
         <entry key="..\:/Users/Dell/Desktop/Amit/Android_Projects/archycards/app/src/main/res/layout/item_view.xml" value="0.4" />
       </map>
     </option>

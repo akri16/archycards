@@ -1,9 +1,12 @@
 package com.akribase.archycards
 
+import android.animation.ObjectAnimator
 import android.content.res.ColorStateList
 import android.content.res.Resources
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.animation.AccelerateDecelerateInterpolator
+import android.view.animation.BounceInterpolator
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
@@ -30,6 +33,18 @@ class MainActivity : AppCompatActivity() {
         }
 
         initRv(binding.rv)
+        initAnim()
+    }
+
+    private fun initAnim() {
+        val arrowView = binding.doubleArrow
+        ObjectAnimator.ofFloat(arrowView, "translationY", 0f, 50f).apply {
+            interpolator = BounceInterpolator()
+            repeatMode = ObjectAnimator.REVERSE
+            repeatCount = ObjectAnimator.INFINITE
+            duration = 2000
+            start()
+        }
     }
 
     private fun initRv(rv: RecyclerView) {
@@ -41,10 +56,16 @@ class MainActivity : AppCompatActivity() {
         rv.adapter = RewardsAdapter(rewards, rvState, viewWidth, viewHeight)
         rv.layoutManager = ArcLayoutManager(resources, screenWidth, viewWidth, viewHeight)
 
+        val rvHeight = resources.getDimension(R.dimen.recyclerview_height).toInt()
+        val pad = resources.getDimension(R.dimen.item_spacing).toInt()
+        val selectBoxPadFraction = 0.5f
+        val extraPad = ((1 - selectBoxPadFraction) * pad).toInt()
+
         binding.frame.layoutParams =
             (binding.frame.layoutParams as ConstraintLayout.LayoutParams).apply {
-                width = viewWidth
-                height = viewHeight
+                width = viewWidth - 2 * extraPad
+                height = viewHeight - 2 * extraPad
+                topMargin = rvHeight + extraPad
             }
 
         val snapHelper = LinearSnapHelper()
@@ -60,5 +81,6 @@ class MainActivity : AppCompatActivity() {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
         }
         ItemTouchHelper(swipeHandler).attachToRecyclerView(rv)
+
     }
 }
