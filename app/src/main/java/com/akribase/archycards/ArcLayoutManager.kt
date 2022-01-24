@@ -1,6 +1,8 @@
 package com.akribase.archycards
 
 import android.content.res.Resources
+import android.graphics.Color
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
@@ -20,14 +22,14 @@ class ArcLayoutManager(
     private val viewHeight: Int,
 ):RecyclerView.LayoutManager() {
 
-    var scrollEnabled = true
     private var horizontalScrollOffset = 0
+    var scrollEnabled = true
 
     private val recyclerViewHeight =
         (resources.getDimensionPixelSize(R.dimen.recyclerview_height)).toDouble()
 
     override fun generateDefaultLayoutParams(): RecyclerView.LayoutParams =
-        RecyclerView.LayoutParams(viewWidth, viewHeight)
+        RecyclerView.LayoutParams(MATCH_PARENT, MATCH_PARENT)
 
     override fun onLayoutChildren(recycler: RecyclerView.Recycler, state: RecyclerView.State) {
         fill(recycler, state)
@@ -50,6 +52,16 @@ class ArcLayoutManager(
             addView(view)
 
             layoutChildView(index, viewWidth, view)
+
+            if (recyclerIndex == itemCount/2) {
+                val target = LayoutInflater.from(view.context).inflate(R.layout.item_view, null)
+
+                target.apply {
+                    layoutParams = RecyclerView.LayoutParams(viewWidth, viewHeight)
+                    setBackgroundColor(Color.BLUE)
+                }
+                layoutTarget(recyclerIndex, viewWidth, view)
+            }
         }
 
         // Remove scrap views
@@ -57,6 +69,24 @@ class ArcLayoutManager(
         scrapListCopy.forEach {
             recycler.recycleView(it.itemView)
         }
+    }
+
+    private fun layoutTarget(i: Int, viewWidthWithSpacing: Int, view: View) {
+        val targetWidth = viewWidth
+        val targetHeight = viewHeight
+        val dw = viewWidth - targetWidth
+
+        val viewLeft = i * viewWidthWithSpacing - horizontalScrollOffset
+        val left = viewLeft + dw/2
+        val right = left + targetWidth
+
+        val top = height - targetHeight
+        val bottom = top + targetHeight
+
+        // Measure
+        measureChild(view, targetWidth, targetHeight)
+        // Layout
+        layoutDecorated(view, left, top, right, bottom)
     }
 
     private fun layoutChildView(i: Int, viewWidthWithSpacing: Int, view: View) {
@@ -78,9 +108,9 @@ class ArcLayoutManager(
         view.rotation = 90f - (alpha * (180 / PI)).toFloat()
 
         // Measure
-        measureChildWithMargins(view, 0, 0)
+        measureChild(view, viewWidth, viewHeight + 200)
         // Layout
-        layoutDecoratedWithMargins(view, left, top, right, bottom)
+        layoutDecorated(view, left, top, right, bottom)
     }
 
     override fun canScrollHorizontally() = scrollEnabled
