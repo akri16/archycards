@@ -22,9 +22,14 @@ class RewardsAdapter(
 
         init {
 
-            binding.root.layoutParams = binding.root.layoutParams.apply {
+            binding.imageView.layoutParams = binding.imageView.layoutParams.apply {
                 width = itemWidth
                 height = itemHeight
+            }
+
+            binding.root.layoutParams = binding.root.layoutParams.apply {
+                width = itemWidth
+                height = 1000
             }
         }
 

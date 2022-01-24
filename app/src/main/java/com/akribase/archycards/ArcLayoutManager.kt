@@ -26,7 +26,7 @@ class ArcLayoutManager(
         (resources.getDimensionPixelSize(R.dimen.recyclerview_height)).toDouble()
 
     override fun generateDefaultLayoutParams(): RecyclerView.LayoutParams =
-        RecyclerView.LayoutParams(viewWidth, viewHeight)
+        RecyclerView.LayoutParams(MATCH_PARENT, MATCH_PARENT)
 
     override fun onLayoutChildren(recycler: RecyclerView.Recycler, state: RecyclerView.State) {
         fill(recycler, state)
@@ -71,15 +71,15 @@ class ArcLayoutManager(
         val yComponent = radius - (radius * sin(alpha))
 
         val top = (h - yComponent).toInt()
-        val bottom = top + viewHeight
+        val bottom = top + viewHeight + 200
 
         // View Rotation
         view.rotation = 90f - (alpha * (180 / PI)).toFloat()
 
         // Measure
-        measureChildWithMargins(view, 0, 0)
+        measureChild(view, viewWidth, viewHeight + 200)
         // Layout
-        layoutDecoratedWithMargins(view, left, top, right, bottom)
+        layoutDecorated(view, left, top, right, bottom)
     }
 
     override fun canScrollHorizontally() = true

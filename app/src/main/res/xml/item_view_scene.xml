@@ -6,11 +6,22 @@
         <Constraint android:id="@+id/imageView" />
     </ConstraintSet>
 
-    <ConstraintSet android:id="@+id/end">
-        <Constraint android:id="@id/imageView" />
+    <ConstraintSet android:id="@+id/end"
+        app:deriveConstraintsFrom="@id/start">
+        <Constraint android:id="@id/imageView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
     </ConstraintSet>
 
     <Transition
         app:constraintSetEnd="@id/end"
-        app:constraintSetStart="@+id/start" />
+        app:constraintSetStart="@+id/start" >
+        <OnSwipe app:dragDirection="dragDown"
+            app:touchAnchorId="@id/imageView"
+            app:dragThreshold="0.8"
+            app:touchAnchorSide="middle" />
+    </Transition>
 </MotionScene>

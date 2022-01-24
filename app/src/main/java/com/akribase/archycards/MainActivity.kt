@@ -80,7 +80,7 @@ class MainActivity : AppCompatActivity() {
         val swipeHandler = object : SwipeCallback(this, rvState) {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
         }
-        ItemTouchHelper(swipeHandler).attachToRecyclerView(rv)
+        //ItemTouchHelper(swipeHandler).attachToRecyclerView(rv)
 
     }
 }
