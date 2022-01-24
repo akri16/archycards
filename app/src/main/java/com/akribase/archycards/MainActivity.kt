@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.akribase.archycards.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var layoutManager: ArcLayoutManager
     private lateinit var binding: ActivityMainBinding
     private var rvState = MutableLiveData(RvState())
 
@@ -30,6 +31,7 @@ class MainActivity : AppCompatActivity() {
             binding.frame.imageTintList = ColorStateList.valueOf(getColor(
                 if (!it.isLongPressed) R.color.primary else R.color.grey
             ))
+            layoutManager.scrollEnabled = !it.isLongPressed
         }
 
         initRv(binding.rv)
@@ -54,7 +56,9 @@ class MainActivity : AppCompatActivity() {
         val viewHeight = (1.25f * viewWidth).toInt()
 
         rv.adapter = RewardsAdapter(rewards, rvState, viewWidth, viewHeight)
-        rv.layoutManager = ArcLayoutManager(resources, screenWidth, viewWidth, viewHeight)
+        rv.layoutManager = ArcLayoutManager(resources, screenWidth, viewWidth, viewHeight).apply {
+            layoutManager = this
+        }
 
         val rvHeight = resources.getDimension(R.dimen.recyclerview_height).toInt()
         val pad = resources.getDimension(R.dimen.item_spacing).toInt()
@@ -80,7 +84,7 @@ class MainActivity : AppCompatActivity() {
         val swipeHandler = object : SwipeCallback(this, rvState) {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
         }
-        ItemTouchHelper(swipeHandler).attachToRecyclerView(rv)
+        swipeHandler.attachToRv(rv)
 
     }
 }

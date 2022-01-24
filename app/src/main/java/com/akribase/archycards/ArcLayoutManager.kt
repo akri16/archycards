@@ -20,6 +20,7 @@ class ArcLayoutManager(
     private val viewHeight: Int,
 ):RecyclerView.LayoutManager() {
 
+    var scrollEnabled = true
     private var horizontalScrollOffset = 0
 
     private val recyclerViewHeight =
@@ -82,7 +83,7 @@ class ArcLayoutManager(
         layoutDecoratedWithMargins(view, left, top, right, bottom)
     }
 
-    override fun canScrollHorizontally() = true
+    override fun canScrollHorizontally() = scrollEnabled
 
     override fun scrollHorizontallyBy(
         dx: Int,

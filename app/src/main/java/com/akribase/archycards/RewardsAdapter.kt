@@ -1,6 +1,7 @@
 package com.akribase.archycards
 
 import android.annotation.SuppressLint
+import android.util.Log
 import android.view.*
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
@@ -19,6 +20,7 @@ class RewardsAdapter(
     @SuppressLint("ClickableViewAccessibility")
     inner class RewardsHolder(private val binding: ItemViewBinding) :
         RecyclerView.ViewHolder(binding.root) {
+        var isLongClicked = false
 
         init {
 
@@ -26,6 +28,9 @@ class RewardsAdapter(
                 width = itemWidth
                 height = itemHeight
             }
+
+
+
         }
 
         fun bind(id: Int) {

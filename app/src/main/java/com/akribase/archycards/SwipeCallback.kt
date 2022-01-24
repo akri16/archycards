@@ -1,9 +1,11 @@
 package com.akribase.archycards;
 
 import android.annotation.SuppressLint
+import android.content.ClipData
 import android.content.Context;
 import android.graphics.Canvas
 import android.util.Log
+import android.view.MotionEvent
 import android.view.View
 import androidx.core.view.MotionEventCompat
 import androidx.lifecycle.MutableLiveData
@@ -14,9 +16,16 @@ import kotlin.math.max
 abstract class SwipeCallback(
     private val context: Context,
     private val rvstate: MutableLiveData<RvState>
-): ItemTouchHelper.SimpleCallback(ItemTouchHelper.DOWN, 0) {
+) : ItemTouchHelper.SimpleCallback(0, 0) {
 
-    var selectedView: View? = null
+    private var maxTranslation: Int = 0
+    private var rv: RecyclerView? = null
+    private var selectedView: View? = null
+
+    fun attachToRv(recyclerView: RecyclerView): ItemTouchHelper {
+        rv = recyclerView
+        return ItemTouchHelper(this).apply { attachToRecyclerView(recyclerView) }
+    }
 
     override fun onMove(
         recyclerView: RecyclerView,
@@ -49,8 +58,8 @@ abstract class SwipeCallback(
         val rvHeight = recyclerView.height
         val viewPos = recyclerView.getChildRelativePos(viewHolder.itemView)
         val itemHeight = viewHolder.itemView.height
-        val maxTranslation = rvHeight - viewPos.top - itemHeight/2
-        val progress = dY/maxTranslation
+        maxTranslation = rvHeight - viewPos.top
+        val progress = dY / maxTranslation
 
         rvstate.value = rvstate.value?.copy(progress = progress)
     }
@@ -67,6 +76,7 @@ abstract class SwipeCallback(
             selectedView?.animate()?.scaleX(1f)?.scaleY(1f)?.withEndAction {
                 rvstate.value = rvstate.value?.copy(isLongPressed = false)
             }
+
             selectedView = null
         }
 
