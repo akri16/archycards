@@ -5,15 +5,10 @@ import android.content.res.ColorStateList
 import android.content.res.Resources
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.BounceInterpolator
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.map
-import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.akribase.archycards.databinding.ActivityMainBinding
@@ -80,11 +75,6 @@ class MainActivity : AppCompatActivity() {
         snapOnScrollListener.snapPosition.observe(this) {
             rvState.apply { value = value?.copy(snapPosition = it) }
         }
-
-        val swipeHandler = object : SwipeCallback(this, rvState) {
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
-        }
-        swipeHandler.attachToRv(rv)
-
+        ItemDragDownHelper(this, rvState).attachToRv(rv)
     }
 }

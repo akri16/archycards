@@ -22,7 +22,7 @@ class ArcLayoutManager(
     private val viewHeight: Int,
 ):RecyclerView.LayoutManager() {
 
-    private var horizontalScrollOffset = 0
+    private var horizontalScrollOffset = viewWidth / 2
     var scrollEnabled = true
 
     private val recyclerViewHeight =
@@ -53,15 +53,15 @@ class ArcLayoutManager(
 
             layoutChildView(index, viewWidth, view)
 
-            if (recyclerIndex == itemCount/2) {
-                val target = LayoutInflater.from(view.context).inflate(R.layout.item_view, null)
-
-                target.apply {
-                    layoutParams = RecyclerView.LayoutParams(viewWidth, viewHeight)
-                    setBackgroundColor(Color.BLUE)
-                }
-                layoutTarget(recyclerIndex, viewWidth, view)
-            }
+//            if (recyclerIndex == itemCount/2) {
+//                val target = LayoutInflater.from(view.context).inflate(R.layout.item_view, null)
+//
+//                target.apply {
+//                    layoutParams = RecyclerView.LayoutParams(viewWidth, viewHeight)
+//                    setBackgroundColor(Color.BLUE)
+//                }
+//                layoutTarget(recyclerIndex, viewWidth, view)
+//            }
         }
 
         // Remove scrap views
