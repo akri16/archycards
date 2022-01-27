@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">archycards</string>
+    <string name="drag_down_to_activate_offer">Drag down to activate offer</string>
+    <string name="release_to_activate_offer">Release to activate offer!</string>
+    <string name="t_amp_cs"><![CDATA[T&Cs]]></string>
+    <string name="choose_your_welcome_gift">Choose your welcome gift</string>
+    <string name="activating_offer">Activating the offer for you...</string>
+    <string name="gift">🎁</string>
 </resources>

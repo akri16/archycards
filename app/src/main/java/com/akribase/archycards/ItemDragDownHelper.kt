@@ -8,15 +8,15 @@ import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 
 class ItemDragDownHelper(
-    context: Context,
-    private val rvstate: MutableLiveData<RvState>
+    val context: Context,
+    private val rvstate: MutableLiveData<RvState>,
+    var dragThreshold: Float = 0.5f,
+    var viewScaleFactor: Float = 1.2f
 ) {
     private var rv: RecyclerView? = null
     private var gestureDetector = GestureDetector(context, DragGestureListener())
     private var itemTouchListener = DragItemTouchListener()
     private var selected: Selected? = null
-
-    var dragThreshold = 0.5f
 
     private fun ViewPropertyAnimator.setParams() {
         interpolator = AccelerateInterpolator(0.8f)
@@ -59,21 +59,24 @@ class ItemDragDownHelper(
 
             when (e.actionMasked) {
                 MotionEvent.ACTION_UP -> {
-                    val maxTranslation = calculateMaxTranslation()
-                    val progress = calculateProgress(selectedConst.translation, maxTranslation)
+                    val progress = rvstate.value?.progress ?: 0f
                     val itemView = selectedConst.selected.itemView
 
-                    if (progress > dragThreshold) {
-//                        itemView.animate().translationY(maxTranslation.toFloat())
-                    } else {
+                    if (progress <= dragThreshold) {
                         itemView.animate()
                             .translationY(0f)
                             .scaleX(1f)
                             .scaleY(1f).setParams()
                     }
+
                     selected = null
+                    rvstate.value = rvstate.value?.copy(isLongPressed = false)
                 }
                 MotionEvent.ACTION_MOVE -> {
+                    val maxTranslation = calculateMaxTranslation()
+                    val progress = calculateProgress(selectedConst.translation, maxTranslation)
+                    rvstate.value = rvstate.value?.copy(progress = progress)
+
                     val diff = e.rawY - selectedConst.initialY
                     if (diff > 0) {
                         val v = selectedConst.selected.itemView
@@ -99,18 +102,18 @@ class ItemDragDownHelper(
                     v.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
                     rv?.findContainingViewHolder(v)?.let {
                         selected = Selected(it, e.rawY)
+                        rvstate.value = rvstate.value?.copy(isLongPressed = true)
                     }
 
                     // Scale on selected animation
-                    v.animate()?.scaleX(VIEW_SCALE_FACTOR)?.scaleY(VIEW_SCALE_FACTOR)?.setParams()
+                    v.animate()
+                        .scaleX(viewScaleFactor)
+                        .scaleY(viewScaleFactor)
+                        .translationZBy(10.pxToDp(context))
+                        .setParams()
                 }
             }
         }
-    }
-
-    companion object {
-        // TODO: Make dynamic
-        private const val VIEW_SCALE_FACTOR = 1.2f
     }
 
     data class Selected(

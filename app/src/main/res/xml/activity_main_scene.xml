@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MotionScene xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ConstraintSet android:id="@+id/start">
+        <Constraint android:id="@+id/rv" />
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/end">
+        <Constraint android:id="@id/rv"
+            android:layout_height="0dp"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginBottom="-20dp"
+            app:layout_constraintBottom_toTopOf="@+id/imageView2"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_width="0dp"
+            android:alpha="0" />
+        <Constraint
+            android:id="@+id/frame"
+            app:layout_constraintWidth_percent="0.5"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_width="wrap_content"
+            android:layout_height="200dp"
+            app:layout_constraintTop_toTopOf="@+id/rv"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="28dp"
+            android:alpha="0" />
+
+        <Constraint
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/iv_back"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="0dp"
+            app:layout_constraintVertical_bias="0.3"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:id="@+id/ic_gift" />
+        <Constraint
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_width="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/frame"
+            android:id="@+id/double_arrow" />
+    </ConstraintSet>
+
+    <Transition
+        app:constraintSetEnd="@id/end"
+        app:constraintSetStart="@+id/start"
+        app:motionInterpolator="easeInOut"
+        app:duration="@integer/material_motion_duration_long_1">
+
+        <KeyFrameSet>
+            <KeyAttribute
+                app:framePosition="30"
+                android:alpha="0"
+                app:motionTarget="@id/rv"/>
+
+            <KeyAttribute
+                app:framePosition="30"
+                android:alpha="0"
+                app:motionTarget="@id/frame"/>
+
+            <KeyAttribute
+                app:framePosition="1"
+                android:alpha="0"
+                app:motionTarget="@id/double_arrow"/>
+
+        </KeyFrameSet>
+
+    </Transition>
+</MotionScene>

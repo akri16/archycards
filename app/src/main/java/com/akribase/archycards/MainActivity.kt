@@ -1,11 +1,18 @@
 package com.akribase.archycards
 
 import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.content.res.ColorStateList
 import android.content.res.Resources
+import android.graphics.drawable.GradientDrawable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import android.view.View
+import android.view.animation.AccelerateDecelerateInterpolator
+import android.view.animation.AccelerateInterpolator
 import android.view.animation.BounceInterpolator
+import android.view.animation.LinearInterpolator
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.MutableLiveData
@@ -14,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.akribase.archycards.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var snapHelper: LinearSnapHelper
     private lateinit var layoutManager: ArcLayoutManager
     private lateinit var binding: ActivityMainBinding
     private var rvState = MutableLiveData(RvState())
@@ -23,17 +31,41 @@ class MainActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
         rvState.observe(this) {
-            binding.frame.imageTintList = ColorStateList.valueOf(getColor(
-                if (!it.isLongPressed) R.color.primary else R.color.grey
-            ))
+            binding.frame.imageTintList = ColorStateList.valueOf(
+                getColor(
+                    if (it.isLongPressed || it.progress > 0.5) R.color.grey else R.color.primary
+                )
+            )
+
+            binding.tvDragDown.apply {
+                setTextColor(getColor(if (!it.isLongPressed) R.color.grey else R.color.primary))
+                alpha = if (it.progress > 0.5) 0f else 1f
+            }
+
+            binding.tvMain.apply {
+                if (it.progress > 0.5) {
+                    setTextColor(getColor(R.color.primary))
+                    text = getString(
+                        if (it.isLongPressed) R.string.release_to_activate_offer else R.string.activating_offer
+                    )
+                } else {
+                    setTextColor(getColor(R.color.white))
+                    text = getString(R.string.choose_your_welcome_gift)
+                }
+            }
+
+            if (it.progress > 0.5 && !it.isLongPressed) binding.ml.transitionToEnd()
+
             layoutManager.scrollEnabled = !it.isLongPressed
         }
 
+
         initRv(binding.rv)
-        initAnim()
+        initArrowAnim()
     }
 
-    private fun initAnim() {
+
+    private fun initArrowAnim() {
         val arrowView = binding.doubleArrow
         ObjectAnimator.ofFloat(arrowView, "translationY", 0f, 50f).apply {
             interpolator = BounceInterpolator()
@@ -46,28 +78,36 @@ class MainActivity : AppCompatActivity() {
 
     private fun initRv(rv: RecyclerView) {
         val rewards = listOf(R.drawable.reward1, R.drawable.reward2, R.drawable.reward3)
+
         val screenWidth = Resources.getSystem().displayMetrics.widthPixels
-        val viewWidth = screenWidth/2
+        val rvHeight = resources.getDimension(R.dimen.recyclerview_height).toInt()
+        val pad = resources.getDimension(R.dimen.item_spacing).toInt()
+        val selectBoxPadFraction = 0.5f
+        val selectBoxPad = (selectBoxPadFraction * pad).toInt()
+        val extraPad = pad - selectBoxPad
+        val viewWidth = screenWidth / 2
         val viewHeight = (1.25f * viewWidth).toInt()
+
+        val effViewWidth = viewWidth - 2 * extraPad
+        val effViewHeight = viewHeight - 2 * extraPad
+        val viewScaleFactor = effViewWidth.toFloat() / (effViewWidth - 2 * selectBoxPad)
 
         rv.adapter = RewardsAdapter(rewards, rvState, viewWidth, viewHeight)
         rv.layoutManager = ArcLayoutManager(resources, screenWidth, viewWidth, viewHeight).apply {
             layoutManager = this
         }
 
-        val rvHeight = resources.getDimension(R.dimen.recyclerview_height).toInt()
-        val pad = resources.getDimension(R.dimen.item_spacing).toInt()
-        val selectBoxPadFraction = 0.5f
-        val extraPad = ((1 - selectBoxPadFraction) * pad).toInt()
+        (binding.frame.layoutParams as ConstraintLayout.LayoutParams).apply {
+            width = effViewWidth
+            height = effViewHeight
+            topMargin = rvHeight + extraPad
+        }
 
-        binding.frame.layoutParams =
-            (binding.frame.layoutParams as ConstraintLayout.LayoutParams).apply {
-                width = viewWidth - 2 * extraPad
-                height = viewHeight - 2 * extraPad
-                topMargin = rvHeight + extraPad
-            }
+        binding.glowView.layoutParams.apply {
+            width = effViewWidth
+        }
 
-        val snapHelper = LinearSnapHelper()
+        snapHelper = LinearSnapHelper()
         snapHelper.attachToRecyclerView(rv)
 
         val snapOnScrollListener = SnapOnScrollListener(snapHelper)
@@ -75,6 +115,18 @@ class MainActivity : AppCompatActivity() {
         snapOnScrollListener.snapPosition.observe(this) {
             rvState.apply { value = value?.copy(snapPosition = it) }
         }
-        ItemDragDownHelper(this, rvState).attachToRv(rv)
+
+        ItemDragDownHelper(
+            this,
+            rvState,
+            0.5f,
+            viewScaleFactor
+        ).attachToRv(rv)
     }
+
+    override fun onResume() {
+        super.onResume()
+        binding.rv.smoothScrollBy(1, 0)
+    }
+
 }
